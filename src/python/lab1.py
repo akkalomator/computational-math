@@ -10,7 +10,7 @@ DELTA = 0.000001
 
 def f(x):
     return quad(
-        lambda t: sin(t) * sin(t),
+        lambda t: sin(t*t),
         0, x)
 
 
