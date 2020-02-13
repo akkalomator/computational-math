@@ -42,11 +42,7 @@ x_new = numpy.arange(new_start, new_end + DELTA, h)
 y_quanc = numpy.array([f(xi) for xi in x_new])
 
 # Map x_new to spline(x_new)
-yl = []
-for fi in y_with_eps:
-    (f, _) = fi
-    yl.append(f)
-y = numpy.array(yl)
+y = numpy.array([yi for (yi, _) in y_with_eps])
 spline_coefficients = splrep(x, y, s=0)  # spline
 y_spline = splev(x_new, spline_coefficients, der=0)  # seval
 
