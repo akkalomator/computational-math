@@ -74,14 +74,14 @@ while numpy.abs(current - upper_bound) > TOLERANCE:
     current += step
     print("{0:1.2f} : {1}".format(current, res))
 
-fig1, ax1 = pyplot.subplots()
+_, ax1 = pyplot.subplots()
 ax1.plot(0, 0, 'o', label="Earth", markersize=12)
 ax1.plot(1, 0, 'o', label="Moon", markersize=6)
 ax1.plot(x, y, label="(x, y)")
 ax1.set_title("Space plot")
 ax1.legend()
 
-fig2, ax2 = pyplot.subplots()
+_, ax2 = pyplot.subplots()
 ax2.plot(t, dx, label="dx/dt(t)")
 ax2.plot(t, dy, label="dy/dt(t)")
 ax2.set_title("Velocities")
