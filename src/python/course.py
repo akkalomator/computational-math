@@ -3,7 +3,7 @@ from matplotlib import pyplot
 from scipy.integrate import quad, RK45
 from scipy.optimize import toms748
 
-TOLERANCE = 0.00001
+TOLERANCE = 1e-6
 
 MU = 1 / 82.3
 T = 12
@@ -49,42 +49,52 @@ initial = numpy.array([
 lower_bound = 0
 upper_bound = T
 step = 0.1
-current = lower_bound
-res = initial
 
-t = numpy.arange(lower_bound, upper_bound + TOLERANCE, step)
-x, dx, y, dy = [a], [b], [c], [d]
+_, space_plot = pyplot.subplots()
+_, velocities_plot = pyplot.subplots()
 
-while numpy.abs(current - upper_bound) > TOLERANCE:
-    integrator = RK45(
-        fun=motion_equation,
-        t0=current,
-        y0=res,
-        t_bound=current + step,
-        rtol=0.00001
-    )
-    while integrator.status == "running":
-        integrator.step()
-    res = integrator.y
-    x_, dx_, y_, dy_ = res
-    x.append(x_)
-    dx.append(dx_)
-    y.append(y_)
-    dy.append(dy_)
-    current += step
-    print("{0:1.2f} : {1}".format(current, res))
 
-_, ax1 = pyplot.subplots()
-ax1.plot(0, 0, 'o', label="Earth", markersize=12)
-ax1.plot(1, 0, 'o', label="Moon", markersize=6)
-ax1.plot(x, y, label="(x, y)")
-ax1.set_title("Space plot")
-ax1.legend()
+def simulate(initial_state, name=""):
+    current = lower_bound
+    res = initial_state.copy()
+    total_tol = [0, 0, 0, 0]
+    t = numpy.arange(lower_bound, upper_bound + TOLERANCE, step)
+    x, dx, y, dy = [initial_state[0]], [initial_state[1]], [initial_state[2]], [initial_state[3]]
+    while numpy.abs(current - upper_bound) > TOLERANCE:
+        integrator = RK45(
+            fun=motion_equation,
+            t0=current,
+            y0=res,
+            t_bound=current + step,
+            rtol=TOLERANCE
+        )
+        while integrator.status == "running":
+            integrator.step()
+        previous_res = res
+        res = integrator.y
+        x_, dx_, y_, dy_ = res
+        x.append(x_)
+        dx.append(dx_)
+        y.append(y_)
+        dy.append(dy_)
+        current += step
+        tolerance = abs(res - previous_res) * TOLERANCE
+        total_tol += tolerance
+        print("{0:1.2f} : {1}\n       ±{2}".format(current, res, total_tol))
 
-_, ax2 = pyplot.subplots()
-ax2.plot(t, dx, label="dx/dt(t)")
-ax2.plot(t, dy, label="dy/dt(t)")
-ax2.set_title("Velocities")
-ax2.legend()
+    space_plot.plot(x, y, label="{0} : (x, y)".format(name))
+    velocities_plot.plot(t, dx, label="{0}: dx/dt(t)".format(name))
+    velocities_plot.plot(t, dy, label="{0}: dy/dt(t)".format(name))
 
+
+print("Relative tolerance = {0}".format(TOLERANCE))
+simulate(initial_state=initial, name="1")
+simulate(initial_state=initial * 1.05, name="2")
+simulate(initial_state=initial * 1.3, name="3")
+space_plot.set_title("Space plot")
+space_plot.plot(0, 0, 'o', label="Earth", markersize=12)
+space_plot.plot(1, 0, 'o', label="Moon", markersize=6)
+space_plot.legend()
+velocities_plot.set_title("Velocities")
+velocities_plot.legend()
 pyplot.show()
