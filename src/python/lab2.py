@@ -14,7 +14,7 @@ BASE_A = numpy.array([
 
 BASE_B = numpy.array([-175, 133, 110, 112, 17, 32, 13, -18])
 
-P = numpy.array([10, 1, 0.1, 0.01, 0.0001, 0.000001, 0.00000001, 0.000000000000001, 0])
+P = numpy.array([1, 0.1, 0.01, 0.0001, 0.000001])
 
 
 def generate_system(param):
