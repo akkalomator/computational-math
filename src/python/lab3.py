@@ -1,7 +1,7 @@
 import numpy
 from scipy.integrate import RK45
 
-from python.RK3 import print_rk3
+from python.RK3 import print_integrated, RK3
 
 
 def f(t, x):
@@ -36,17 +36,15 @@ while current < upper_bound:
     current += step
     print("{0:1.2f} : {1}".format(current, res))
 
-print_rk3(
-    fun=f,
-    lower_bound=lower_bound,
-    y0=initial.copy(),
-    upper_bound=upper_bound,
+integrator = RK3(f, lower_bound, initial.copy(), upper_bound)
+print("Max step for RK3 (recommendation): {0}".format(integrator.max_step()))
+print_integrated(
+    integrator=integrator,
     integration_step=0.1,
     print_step=0.1)
-print_rk3(
-    fun=f,
-    lower_bound=lower_bound,
-    y0=initial.copy(),
-    upper_bound=upper_bound,
-    integration_step=0.01,
+
+integrator = RK3(f, lower_bound, initial.copy(), upper_bound)
+print_integrated(
+    integrator=integrator,
+    integration_step=0.05,
     print_step=0.1)

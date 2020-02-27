@@ -1,4 +1,7 @@
 import numpy
+from scipy import linalg
+from scipy.linalg import norm
+from scipy.optimize import toms748, minimize
 
 
 class RK3:
@@ -36,15 +39,25 @@ class RK3:
     def z(self, k1, k2, k3):
         return self.y + (k1 + 4 * k2 + k3) / 6
 
+    def max_step(self):
+        t_dependent = self.f(0, [0, 0])
+        matrix = []
+        for i in range(self.y.size):
+            x = numpy.array([1 if i == j else 0 for j in range(self.y.size)])
+            column = self.f(0, x) - t_dependent
+            matrix.append(column)
+        lam = abs(min(filter(lambda l: l < 0, linalg.eig(matrix)[0])).real)
+        return 2.513 / lam
 
-def print_rk3(fun, lower_bound, y0, upper_bound, integration_step, print_step):
+
+def print_integrated(integrator, integration_step, print_step):
     print("------------RK3--------------")
     print("Integration step: {0}".format(integration_step))
-    rk3_integrator = RK3(fun, lower_bound, y0, upper_bound)
+
     cur_step = 0
-    while rk3_integrator.status == "running":
-        rk3_integrator.step(integration_step)
+    while integrator.status == "running":
+        integrator.step(integration_step)
         cur_step += integration_step
         if numpy.abs(cur_step - print_step) < 0.000001:
             cur_step = 0
-            print("{0:1.2f} : {1}".format(rk3_integrator.t, rk3_integrator.y))
+            print("{0:1.2f} : {1}".format(integrator.t, integrator.y))
